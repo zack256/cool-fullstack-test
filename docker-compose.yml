@@ -1,0 +1,7 @@
+name: coolapp
+
+services:
+  frontend:
+    build: ./frontend
+  db:
+    image: mongo
