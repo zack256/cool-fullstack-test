@@ -2,7 +2,7 @@ import AWS from "aws-sdk";
 import fs from "fs";
 import path from "path";
 
-let uploadFileToBucket = function (filePath) {
+let uploadFileToBucket = async function (filePath, deleteFileAfter) {
 
     AWS.config.update({region: process.env.BUCKET_REGION});
     let s3 = new AWS.S3();
@@ -16,11 +16,13 @@ let uploadFileToBucket = function (filePath) {
         Body: fileStream
     };
 
-    console.log(uploadParams);
+    let uploadResult = await s3.upload(uploadParams).promise();
 
-    s3.upload(uploadParams, function (err, data) {
-        console.log(data, "and", err);
-    });
+    console.log(uploadResult);
+
+    if (deleteFileAfter) {
+        fs.unlink(filePath, (err) => { if (err) throw err; });
+    }
 
 }
 

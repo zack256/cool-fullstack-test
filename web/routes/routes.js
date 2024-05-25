@@ -1,5 +1,6 @@
 import { Router } from "express";
 import multer from "multer";
+import {MongoClient} from 'mongodb';
 
 import uploadFileToBucket from "../s3.js";
 
@@ -14,9 +15,30 @@ router.route("/")
 
 router.route("/upload")
     .post(upload.single("file"), async (req, res) => {
-        let filePath = req.file.destination + req.file.filename;
-        uploadFileToBucket(filePath);
-        res.json("File should be uploaded!");
+
+        const filePath = req.file.destination + req.file.filename;
+        uploadFileToBucket(filePath, true);
+
+        const mongoURI = "mongodb://" + process.env.MONGO_URL + ":" + process.env.MONGO_PORT;
+        const dbName = process.env.MONGO_DB_NAME;
+        const mongoConnection = new MongoClient(mongoURI);
+        try {
+            // const mongoConnection = await MongoClient.connect(mongoURI);
+            const db = mongoConnection.db(dbName);
+            const fileCollection = db.collection("files");
+            const fileObj = {
+                fileName: req.file.filename,
+                processed: false
+            };
+            const insertionResult = await fileCollection.insertOne(fileObj);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            await mongoConnection.close();
+        }
+
+        res.json("should be inserted!");
+
     });
 
 router.route("/params")
