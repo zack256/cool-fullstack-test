@@ -1,4 +1,8 @@
 <div>
-    <h1>Welcome!</h1>
-    <p>Have fun!</p>
+    <h3>File upload</h3>
+    <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm"></form>
+    <label for="fileInput">File:</label>
+    <input type="file" id="fileInput" form="uploadForm" name="file"/>
+    <button type="reset" form="uploadForm">Cancel</button>
+    <button type="submit" form="uploadForm">Upload</button>
 </div>
