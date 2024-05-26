@@ -3,5 +3,9 @@ name: coolapp
 services:
   web:
     build: ./web
+    ports:
+      - "8000:3000"
   db:
     image: mongo
+    ports:
+      - "8001:27017"
