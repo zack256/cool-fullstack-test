@@ -3,3 +3,5 @@ package-lock.json
 .env
 web/public/uploads
 aws_credentials
+ml/mnist/data
+venv
