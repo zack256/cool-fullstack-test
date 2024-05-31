@@ -2,7 +2,6 @@ from keras import Sequential, Input
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from keras.optimizers import SGD
 
-
 def define_model(
         learning_rate=0.01,
         momentum=0.9,
