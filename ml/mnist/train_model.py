@@ -1,5 +1,7 @@
 # Based on https://machinelearningmastery.com/how-to-develop-a-convolutional-neural-network-from-scratch-for-mnist-handwritten-digit-classification/
 
+import sys
+
 import load_data
 import define_model
 
@@ -16,3 +18,6 @@ def train_model(write_filename=None):
     if write_filename:
         model.save(write_filename)
     return model
+
+if __name__ == "__main__":
+    train_model(sys.argv[1])
