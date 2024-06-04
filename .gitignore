@@ -1,7 +1,13 @@
+# web
 node_modules
 package-lock.json
-.env
-web/public/uploads
-aws_credentials
-ml/mnist/data
+web/public
+
+# Credentials
+web/.env
+web/aws_credentials
+
+# ml
+ml/data
 venv
+__pycache__
