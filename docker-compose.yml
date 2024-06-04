@@ -5,6 +5,8 @@ services:
     build: ./web
     ports:
       - "8000:3000"
+  ml:
+    build: ./ml
   db:
     image: mongo
     ports:
