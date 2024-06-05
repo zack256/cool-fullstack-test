@@ -6,6 +6,8 @@ web/public
 # Credentials
 web/.env
 web/aws_credentials
+ml/ml.env
+ml/aws_credentials
 
 # ml
 ml/data

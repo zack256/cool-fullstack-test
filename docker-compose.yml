@@ -7,6 +7,7 @@ services:
       - "8000:3000"
   ml:
     build: ./ml
+    env_file: ./ml/ml.env
   db:
     image: mongo
     ports:
