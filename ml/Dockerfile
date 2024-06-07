@@ -1,29 +1,41 @@
-FROM python
+FROM python AS builder
 
 WORKDIR /app
 
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+ENV PATH="/venv/bin:$PATH"
+
+RUN python -m venv /venv
+
+COPY container_requirements.txt ./requirements.txt
+
+RUN pip install -r requirements.txt
+
+###########################
+
+FROM python AS app
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+ENV PATH="/venv/bin:$PATH"
+
+COPY --from=builder /venv /venv
+
 COPY model.keras .
 COPY app.py .
-COPY container_requirements.txt requirements.txt
 COPY ../aws_credentials .
 
 RUN mkdir downloads
-
-# We'll use venv in the future!
-
-# RUN python -m venv venv && \
-#     source venv/bin/activate && \
-#     pip install -r requirements.txt
 
 # Might be a better way to do this...
 RUN \
     mkdir ~/.aws && \
     mv aws_credentials ~/.aws/credentials
-
-RUN pip install -r requirements.txt
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
 
 ENTRYPOINT ["/bin/bash", "-c"]
 
