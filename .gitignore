@@ -10,7 +10,7 @@ ml/ml.env
 ml/aws_credentials
 
 # ml
-ml/data
+ml/ml/data
 venv
 __pycache__
 model.keras
