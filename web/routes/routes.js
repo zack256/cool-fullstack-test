@@ -17,9 +17,9 @@ router.route("/upload")
     .post(upload.single("file"), async (req, res) => {
 
         const filePath = req.file.destination + req.file.filename;
-        uploadFileToBucket(filePath, true);
+        let keyOfInsertedObject = await uploadFileToBucket(filePath, true);
 
-        const mongoURI = "mongodb://" + process.env.MONGO_URL + ":" + process.env.MONGO_PORT;
+        const mongoURI = "mongodb://" + process.env.MONGO_HOST + ":" + process.env.MONGO_PORT;
         const dbName = process.env.MONGO_DB_NAME;
         const mongoConnection = new MongoClient(mongoURI);
         try {
@@ -27,8 +27,9 @@ router.route("/upload")
             const db = mongoConnection.db(dbName);
             const fileCollection = db.collection("files");
             const fileObj = {
-                fileName: req.file.filename,
-                processed: false
+                key: keyOfInsertedObject,
+                processed: false,
+                result: null
             };
             const insertionResult = await fileCollection.insertOne(fileObj);
         } catch (e) {

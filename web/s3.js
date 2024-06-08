@@ -18,11 +18,11 @@ let uploadFileToBucket = async function (filePath, deleteFileAfter) {
 
     let uploadResult = await s3.upload(uploadParams).promise();
 
-    console.log(uploadResult);
-
     if (deleteFileAfter) {
         fs.unlink(filePath, (err) => { if (err) throw err; });
     }
+
+    return uploadResult["Key"];
 
 }
 
