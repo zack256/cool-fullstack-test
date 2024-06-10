@@ -8,7 +8,15 @@ services:
   ml:
     build: ./ml
     env_file: ./ml/ml.env
+    tty: true
   db:
     image: mongo
     ports:
       - "8001:27017"
+    volumes:
+      - type: volume
+        source: coolapp_db_data
+        target: /data/db
+
+volumes:
+  coolapp_db_data:

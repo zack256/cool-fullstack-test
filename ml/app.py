@@ -5,23 +5,45 @@ import boto3
 import os
 from pymongo import MongoClient
 
-def mongo_testing():
-    mongo_server_host = os.environ["MONGO_HOST"]
-    mongo_server_port = os.environ["MONGO_PORT"]
-    mongo_db_name = os.environ["MONGO_DB_NAME"]
-    mongo_server_uri = f"mongodb://{mongo_server_host}:{mongo_server_port}"
-    client = MongoClient(mongo_server_uri)
-    database = client[mongo_db_name]
-    collection = database["files"]
-    print(list(collection.find()))
-
 def predict_number(model, image_path):
     image = load_img(image_path, color_mode="grayscale", target_size=(28, 28))
     arr = img_to_array(image)
     arr /= 255
     arr = arr.reshape(1, 28, 28, 1)
     output = model.predict(arr)
-    return np.argmax(output)
+    return int(np.argmax(output))
+
+def mongo_testing():
+    mongo_server_host = os.environ["MONGO_HOST"]
+    mongo_server_port = os.environ["MONGO_PORT"]
+    mongo_db_name = os.environ["MONGO_DB_NAME"]
+    bucket_name = os.environ["BUCKET_NAME"]
+    mongo_server_uri = f"mongodb://{mongo_server_host}:{mongo_server_port}"
+    client = MongoClient(mongo_server_uri)
+    database = client[mongo_db_name]
+    collection = database["files"]
+    unprocessed = list(collection.find({"processed": False}))
+    if unprocessed:
+        keys = [doc["key"] for doc in unprocessed]
+        s3 = boto3.client("s3")
+        model = keras.models.load_model("model.keras")
+        for key in keys:
+            save_file_path = os.path.join(os.getcwd(), "downloads", key)
+            with open(save_file_path, "wb") as fi:
+                s3.download_fileobj(bucket_name, key, fi)
+            prediction = predict_number(model, save_file_path)
+            update_info = collection.update_one(
+                {
+                    "key": key
+                },
+                {
+                    "$set": {
+                        "processed": True,
+                        "result": prediction
+                    }
+                }
+            )
+            os.remove(save_file_path)
 
 def predict_all_images_in_s3_bucket():
     s3 = boto3.client("s3")
