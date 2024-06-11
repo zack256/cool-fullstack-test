@@ -1,8 +1,20 @@
 <div>
-    <h3>File upload</h3>
-    <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm"></form>
-    <label for="fileInput">File:</label>
-    <input type="file" id="fileInput" form="uploadForm" name="file"/>
-    <button type="reset" form="uploadForm">Cancel</button>
-    <button type="submit" form="uploadForm">Upload</button>
+    <h3>Images</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each files}}
+            <tr>
+                <td>{{ this.key }}</td>
+                <td>{{ this.result }}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <a href="/upload">Upload image</a>
 </div>

@@ -3,12 +3,14 @@ name: coolapp
 services:
   web:
     build: ./web
+    env_file: ./web/web.env
     ports:
       - "8000:3000"
   ml:
     build: ./ml
     env_file: ./ml/ml.env
-    tty: true
+    # tty: true
+    # command: bash
   db:
     image: mongo
     ports:
