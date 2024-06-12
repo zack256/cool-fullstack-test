@@ -53,6 +53,11 @@ router.route("/upload")
     })
     .post(upload.single("file"), async (req, res) => {
 
+        if (req.file == null) {
+            res.status(500);
+            return res.json("Error, might be fixed on reload");
+        }
+
         const filePath = req.file.destination + req.file.filename;
         let keyOfInsertedObject = await uploadFileToBucket(filePath, true);
 
@@ -70,7 +75,7 @@ router.route("/upload")
             throw e;
         }
 
-        res.json("should be inserted!");
+        res.redirect("/");
 
     });
 

@@ -44,20 +44,7 @@ def mongo_testing():
                 }
             )
             os.remove(save_file_path)
-
-def predict_all_images_in_s3_bucket():
-    s3 = boto3.client("s3")
-    bucket_name = os.environ["BUCKET_NAME"]
-    objects = s3.list_objects_v2(Bucket=bucket_name)
-    if "Contents" in objects:
-        model = keras.models.load_model("model.keras")
-        for object in objects["Contents"]:
-            object_name = object["Key"]
-            save_file_path = os.path.join(os.getcwd(), "downloads", object_name)
-            with open(save_file_path, "wb") as fi:
-                s3.download_fileobj(bucket_name, object_name, fi)
-            prediction = predict_number(model, save_file_path)
-            print(object_name, "->", prediction)
+            s3.delete_object(Bucket=bucket_name, Key=key)
 
 if __name__ == "__main__":
     # predict_all_images_in_s3_bucket()
