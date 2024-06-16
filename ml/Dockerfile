@@ -28,6 +28,10 @@ COPY --from=builder /venv /venv
 
 COPY model.keras .
 COPY app.py .
+COPY ml.env .
+COPY cron.sh .
+COPY start.sh .
+COPY app_cron .
 COPY ../aws_credentials .
 
 RUN mkdir downloads
@@ -37,6 +41,16 @@ RUN \
     mkdir ~/.aws && \
     mv aws_credentials ~/.aws/credentials
 
+RUN \
+    apt update && \
+    apt install -y cron nano
+
+RUN \
+    chmod +x cron.sh && \
+    crontab app_cron
+
 ENTRYPOINT ["/bin/bash", "-c"]
 
-CMD ["python app.py"]
+# CMD ["python app.py"]
+# CMD ["bash start.sh && tail -F /dev/null"]
+CMD ["bash start.sh"]

@@ -5,6 +5,9 @@ import boto3
 import os
 from pymongo import MongoClient
 
+def get_abs_path_from_rel_path(*rel_paths):
+    return os.path.join(os.path.dirname(__file__), *rel_paths)
+
 def predict_number(model, image_path):
     image = load_img(image_path, color_mode="grayscale", target_size=(28, 28))
     arr = img_to_array(image)
@@ -26,9 +29,9 @@ def mongo_testing():
     if unprocessed:
         keys = [doc["key"] for doc in unprocessed]
         s3 = boto3.client("s3")
-        model = keras.models.load_model("model.keras")
+        model = keras.models.load_model(get_abs_path_from_rel_path("model.keras"))
         for key in keys:
-            save_file_path = os.path.join(os.getcwd(), "downloads", key)
+            save_file_path = get_abs_path_from_rel_path("downloads", key)
             with open(save_file_path, "wb") as fi:
                 s3.download_fileobj(bucket_name, key, fi)
             prediction = predict_number(model, save_file_path)
