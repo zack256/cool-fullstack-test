@@ -26,26 +26,25 @@ ENV PATH="/venv/bin:$PATH"
 
 COPY --from=builder /venv /venv
 
-COPY model.keras .
-COPY app.py .
-COPY ml.env .
-COPY cron.sh .
-COPY start.sh .
-COPY app_cron .
-COPY ../aws_credentials .
+COPY \
+    model.keras \
+    app.py \
+    ml.env \
+    cron.sh \
+    start.sh \
+    app_cron \
+    ../aws_credentials \
+    .
 
-RUN mkdir downloads
+# Probably a better way to handle the AWS credentials.
 
-# Might be a better way to do this...
 RUN \
+    mkdir downloads && \
     mkdir ~/.aws && \
-    mv aws_credentials ~/.aws/credentials
-
-RUN \
+    mv aws_credentials ~/.aws/credentials && \
     apt update && \
-    apt install -y cron nano
-
-RUN \
+    apt install -y cron && \
+    rm -rf /var/lib/apt/lists/* && \
     chmod +x cron.sh && \
     crontab app_cron
 

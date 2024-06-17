@@ -1,14 +1,18 @@
-import keras
-from keras.utils import load_img, img_to_array
 import numpy as np
 import boto3
 import os
 from pymongo import MongoClient
 
+def import_keras_functions():
+    # We'll only import them when there are unprocessed images in the db to save time.
+    from keras.models import load_model
+    from keras.utils import load_img, img_to_array
+    return load_model, load_img, img_to_array
+
 def get_abs_path_from_rel_path(*rel_paths):
     return os.path.join(os.path.dirname(__file__), *rel_paths)
 
-def predict_number(model, image_path):
+def predict_number(model, image_path, load_img, img_to_array):
     image = load_img(image_path, color_mode="grayscale", target_size=(28, 28))
     arr = img_to_array(image)
     arr /= 255
@@ -27,14 +31,15 @@ def mongo_testing():
     collection = database["files"]
     unprocessed = list(collection.find({"processed": False}))
     if unprocessed:
+        load_model, load_img, img_to_array = import_keras_functions()
         keys = [doc["key"] for doc in unprocessed]
         s3 = boto3.client("s3")
-        model = keras.models.load_model(get_abs_path_from_rel_path("model.keras"))
+        model = load_model(get_abs_path_from_rel_path("model.keras"))
         for key in keys:
             save_file_path = get_abs_path_from_rel_path("downloads", key)
             with open(save_file_path, "wb") as fi:
                 s3.download_fileobj(bucket_name, key, fi)
-            prediction = predict_number(model, save_file_path)
+            prediction = predict_number(model, save_file_path, load_img, img_to_array)
             update_info = collection.update_one(
                 {
                     "key": key
